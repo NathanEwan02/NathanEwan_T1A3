@@ -2,6 +2,8 @@
 class Character
     attr_accessor :name, :race, :char_type
 
+    @@character_array = []
+
     def initialize(name, race, char_type)
         @name = name
         @race = race
@@ -12,7 +14,6 @@ class Character
     
     def self.setup
         prompt = TTY::Prompt.new
-        character_array = []
         divide = "="*100
 
         puts divide
@@ -22,7 +23,7 @@ class Character
         name = prompt.ask("What is your character's name?")
         puts divide
 
-        character_array.append(name)
+        @@character_array.append(name)
 
         race = prompt.select("Select a character race.") do |options|
             options.choice "Human"
@@ -33,13 +34,13 @@ class Character
         puts divide
 
         if race == "Human"
-            character_array.append("Human")
+            @@character_array.append("Human")
         elsif race == "Elf"
-            character_array.append("Elf")
+            @@character_array.append("Elf")
         elsif race == "Dwarf"
-            character_array.append("Dwarf")
+            @@character_array.append("Dwarf")
         elsif race == "Orge"
-            character_array.append("Ogre")
+            @@character_array.append("Ogre")
         end
 
         character_type = prompt.select("Select a character type.") do |types|
@@ -50,13 +51,17 @@ class Character
         puts divide
 
         if character_type == "Warrior"
-            character_array.append("Warrior")
+            @@character_array.append("Warrior")
         elsif character_type == "Mage"
-            character_array.append("Mage")
+            @@character_array.append("Mage")
         elsif character_type == "Paladin"
-            character_array.append("Paladin")
+            @@character_array.append("Paladin")
         end
-        
-        puts character_array
     end
+
+    def self.get_char_array(array)
+        for items in @@character_array
+            array.append(items)
+        end
+    end 
 end
