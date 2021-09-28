@@ -12,13 +12,10 @@ class Character
     end
 
     
-    def self.setup
+    def self.setup(divide, create_title)
         prompt = TTY::Prompt.new
-        divide = "="*100
 
-        puts divide
-        puts "Character Creator"
-        puts divide
+        create_title
 
         name = prompt.ask("What is your character's name?")
         puts divide
@@ -63,5 +60,6 @@ class Character
         for items in @@character_array
             array.append(items)
         end
-    end 
+    end
+
 end

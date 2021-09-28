@@ -1,6 +1,6 @@
 class Map 
 
-    attr_accessor :name
+    attr_accessor :name, :npcs
     
     def initialize(name, npcs)
         @name = name
