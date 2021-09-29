@@ -38,9 +38,10 @@ def select_option(text, options, prompt, num_inputs, &block)
     block.call(choice)
 end
 
-def talk_to_npcs(list_of_people, &block)
+def talk_to_npcs(list_of_people, divide, &block)
     prompt = TTY::Prompt.new
     talk_to = prompt.select("Who would you wish to speak to first?", list_of_people)
+    puts divide
 
     # yield
     block.call(talk_to)
@@ -62,25 +63,33 @@ while main_menu == true
 
         select_option("Would you like to use an old character?", ["Yes", "No"], prompt, 2) {|choice|
             if choice == "Yes"
-                csv = CSV.read("player.csv", header: true)
-                puts csv.find {|row| row['name'] == 'James'}
+
+                csv = CSV.read("player.csv", headers: true)
+                csv.each_with_index {|row, index|
+                    puts "#{index}: #{row[0]}"
+                }
+
+                character_name = prompt.ask("Which character would you like to choose? (name)",)
+                
+                char = csv.find {|row| row[0] == character_name}
+                
+                player = Character.new(char[0], char[1], char[2])
+            
             else 
                 Character.setup(divide, create_title("Character Creator", divide))
                 Character.get_char_array(character_array)
+
+                name = character_array[0]
+                race = character_array[1]
+                char_type = character_array[2]
+
+                CSV.open("player.csv", "a+", headers: true) do |csv|
+                    csv << [name, race, char_type]
+                end
+
+                player = Character.new(character_array[0], character_array[1], character_array[2])
             end
         }
-
-        player = Character.new(character_array[0], character_array[1], character_array[2])
-        # character_array = []
-
-        # Character.setup(divide, create_title("Character Creator", divide))
-        # Character.get_char_array(character_array)
-
-        # player = Character.new(character_array[0], character_array[1], character_array[2])
-
-        # CSV.open('player.csv', 'a') do |csv|
-        #     csv << [name_var, 18, 'male']
-        # end
 
         game_loop = true 
         
@@ -101,48 +110,58 @@ while main_menu == true
 
             if choice == "Talk to NPC's"
                 # location.talk_to_npcs
-                talk_to_npcs([berwig.name, ravenna.name, jabal.name]) {|talk_to| 
-                    if talk_to == "Berwig"
-                        select_option("Well hello there traveler! May I ask your help?", ["Yes", "No"], prompt, 2) {|choice| 
+                talk_to_npcs([berwig.name, ravenna.name, jabal.name], divide) {|talk_to| 
+                    if talk_to == berwig.name
+                        select_option("Well hello there traveler! Do you need some help finding the 'Holy Sandwich'?", ["Yes", "No"], prompt, 2) {|choice| 
                             if choice == "Yes"
-                                puts "great here is your quest....."
+                                puts "Alright then, make your way over to Jabal he'll explain the rest"
                             else 
-                                puts "thats a shame, have a good day"
+                                puts "That's a shame, fair well"
                             end
                         }
-                    elsif talk_to == "Ravenna"
-                        select_option("Well hello there traveler! Give me all your gold?", ["Yes", "No"], prompt, 2) {|choice| 
+                    elsif talk_to == ravenna.name
+                        select_option("Hi, you said you were sent looking for the sandwich?", ["Yes", "No"], prompt, 2) {|choice| 
                             if choice == "Yes"
-                                puts "pleasure doing business with you"
+                                puts "Sorry, but I don't know anything about that maybe go talk to sheriff Berwig"
                             else 
-                                puts "Ive fought mudcrabs tougher than you"
+                                puts "Oh ok, never mind then"
                             end
                         }
-                    elsif talk_to == "Jabal"
-                        puts "Hello player"
+                    elsif talk_to == jabal.name
+                        select_option("What can I help you with?", ["Finding the Holy Sandwich", "Nevermind"], prompt, 2) { |choice|
+                            if choice == "Finding the Holy Sandwich"
+                                puts "Ah yes of course, you must make your way over to Saxondale, good luck"
+                            else 
+                                puts "Very well"
+                            end
+                        }
                     end
                 }
-                # talk_to = prompt.select("Who would you wish to speak to first? ") do |people|
-                #     people.choice "Berwig"
-                #     people.choice "Ravenna"
-                #     people.choice "Jabal"
-                # end
-
-
-
 
             elsif choice == "Open Game Menu"
-                GameMenu.display_game_menu(player)
+                create_title("Game Menu", divide)
+                select_option("Welcome #{player.name}, what would you like to do?", ["View Map", "Character Options", "Exit Game"], prompt 3) { |choice|
+                    if choice == "View Map"
+                        create_title("Map", divide)
+                        select_option("Select a location", [])
+
+
+                    elsif choice == "Character Options"
+                        puts ""
+                    else 
+                        game_loop = false
+                }
+
+
+                #GameMenu.display_game_menu(player)
             end
         end
 
     elsif choice == "Options"
         puts "opt"
     elsif choice == "Exit"
-        main_menu == false
+        main_menu = false
     end
-
-
-
+    
 end 
 
