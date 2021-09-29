@@ -14,8 +14,14 @@ berwig = Character.new("Berwig", "Elf", "Sheriff")
 ravenna = Character.new("Revanna", "Elf", "Barkeep")
 jabal = Character.new("Jabal", "Elf", "Merchant")
 
+marita = Character.new("Marita", "Human", "Mage")
+nevan = Character.new("Nevan", "Dwarf", "Warrior")
+
 fernsworth = Map.new("Fernsworth", [berwig, ravenna, jabal])
-saxondale = Map.new("Saxondale", [])
+saxondale = Map.new("Saxondale", [marita, nevan])
+
+current_location = fernsworth.name
+unvisited_location = saxondale.name
 
 character_array = []
 
@@ -102,13 +108,13 @@ while main_menu == true
             #     new Person("Adam", {introduction: "Well hello there traveler! May I ask your help?", :yes: "great here is your quest.....", no: "thats a shame, have a good day" }),
             # ])
         
-            choice = prompt.select("Welcome to #{fernsworth.name} #{player.name}, what would you like to do?") do |options|
-                options.choice "Talk to NPC's"
+            choice = prompt.select("Welcome to #{current_location} #{player.name}, what would you like to do?") do |options|
+                options.choice "Talk to NPCs"
                 options.choice "Open Game Menu"
             end 
             puts divide 
 
-            if choice == "Talk to NPC's"
+            if choice == "Talk to NPCs" and current_location == fernsworth.name
                 # location.talk_to_npcs
                 talk_to_npcs([berwig.name, ravenna.name, jabal.name], divide) {|talk_to| 
                     if talk_to == berwig.name
@@ -137,21 +143,62 @@ while main_menu == true
                         }
                     end
                 }
+            
+            elsif choice == "Talk to NPCs" and current_location == saxondale.name
+                talk_to_npcs([marita.name, nevan.name], divide) { |talk_to|
+                    if talk_to == marita.name
+                        select_option("Well hello, are by chance looking for the 'Holy Sandwich'? ", ["Yes", "No"], prompt, 2) { |choice|
+                            if choice == "Yes"
+                                puts "Go to Nevan he'll have it, just make sure you tell him Marita sent you"
+                            else 
+                                puts "Well then, I best be on my way"
+                            end
+                        }
+                    elsif talk_to == nevan.name
+                        select_option("So you say you're looking for the 'Holy Sandwich'?", ["Yes", "No", "Marita sent me"], prompt, 2) { |choice|
+                            if choice == "Yes"
+                                puts "I don't have it go away!"
+                            elsif choice == "No"
+                                puts "Well be gone then"
+                            else 
+                                puts "Ah good, here you go!"
+                                game_loop = false
+                            end
+                        }
+                    end
 
-            elsif choice == "Open Game Menu"
-                create_title("Game Menu", divide)
-                select_option("Welcome #{player.name}, what would you like to do?", ["View Map", "Character Options", "Exit Game"], prompt 3) { |choice|
-                    if choice == "View Map"
-                        create_title("Map", divide)
-                        select_option("Select a location", [])
-
-
-                    elsif choice == "Character Options"
-                        puts ""
-                    else 
-                        game_loop = false
                 }
 
+
+            elsif choice == "Open Game Menu"
+
+                game_menu = true
+                while game_menu == true
+
+                    create_title("Game Menu", divide)
+                    select_option("Welcome #{player.name}, what would you like to do?", ["View Map", "Character Options", "Back", "Exit Game"], prompt, 4) { |choice|
+                        if choice == "View Map"
+                            create_title("Map", divide)
+                            select_option("Select a location", ["Fernsworth", "Saxondale", "Back"], prompt, 3) { |choice|
+                                if choice == current_location
+                                    puts "You are already here"
+                                elsif choice == unvisited_location
+                                    puts "Welcome to Saxondale"
+                                    current_location, unvisited_location = unvisited_location, current_location
+                                else 
+                                end
+                            }
+                        elsif choice == "Character Options"
+                            puts ""
+
+                        elsif choice == "Back"
+                            game_menu = false
+
+                        else 
+                            game_loop = false
+                        end
+                    }
+                end
 
                 #GameMenu.display_game_menu(player)
             end
