@@ -5,17 +5,25 @@ require_relative "classes/main_menu"
 require_relative "classes/character"
 require_relative "classes/game_menu"
 require_relative "classes/map"
+require_relative "classes/NPC"
 
 prompt = TTY::Prompt.new
 
 divide = "="*100
 
-berwig = Character.new("Berwig", "Elf", "Sheriff")
-ravenna = Character.new("Revanna", "Elf", "Barkeep")
-jabal = Character.new("Jabal", "Elf", "Merchant")
+berwig = NPC.new("Berwig", "Well hello there traveler! Do you need some help finding the 'Holy Sandwich'?", 
+    "Alright then, make your way over to Jabal he'll explain the rest", "That's a shame, fair well")
 
-marita = Character.new("Marita", "Human", "Mage")
-nevan = Character.new("Nevan", "Dwarf", "Warrior")
+ravenna = NPC.new("Ravenna", "Hi, you said you were sent looking for the sandwich?", 
+    "Sorry, but I don't know anything about that maybe go talk to sheriff Berwig", "Oh ok, never mind then")
+
+jabal = NPC.new("Jabal", "What can I help you with?", "Ah yes of course, you must make your way over to Saxondale, good luck", 
+    "Very well")
+
+marita = NPC.new("Marita", "Well hello, are by chance looking for the 'Holy Sandwich'? ", 
+    "Go to Nevan he'll have it, just make sure you tell him Marita sent you", "Well then, I best be on my way")
+
+nevan = NPC.new("Nevan", "So you say you're looking for the 'Holy Sandwich'?", "I don't have it go away!", "Well be gone then")
 
 fernsworth = Map.new("Fernsworth", [berwig, ravenna, jabal])
 saxondale = Map.new("Saxondale", [marita, nevan])
@@ -24,6 +32,7 @@ current_location = fernsworth.name
 unvisited_location = saxondale.name
 
 character_array = []
+error = false
 
 player = Character.new("", "", "")
 
@@ -78,8 +87,13 @@ while main_menu == true
                 character_name = prompt.ask("Which character would you like to choose? (name)",)
                 
                 char = csv.find {|row| row[0] == character_name}
-                
-                player = Character.new(char[0], char[1], char[2])
+
+                if char == nil
+                    puts "Error, no character by this name"
+                    error = true
+                elsif char != nil
+                    player = Character.new(char[0], char[1], char[2])
+                end
             
             else 
                 Character.setup(divide, create_title("Character Creator", divide))
@@ -98,6 +112,10 @@ while main_menu == true
         }
 
         game_loop = true 
+
+        if error == true
+            game_loop = false
+        end
         
         while game_loop == true
             create_title(fernsworth.name, divide)
@@ -118,27 +136,27 @@ while main_menu == true
                 # location.talk_to_npcs
                 talk_to_npcs([berwig.name, ravenna.name, jabal.name], divide) {|talk_to| 
                     if talk_to == berwig.name
-                        select_option("Well hello there traveler! Do you need some help finding the 'Holy Sandwich'?", ["Yes", "No"], prompt, 2) {|choice| 
+                        select_option(berwig.introduction, ["Yes", "No"], prompt, 2) {|choice| 
                             if choice == "Yes"
-                                puts "Alright then, make your way over to Jabal he'll explain the rest"
+                                puts berwig.response_1
                             else 
-                                puts "That's a shame, fair well"
+                                puts berwig.response_2
                             end
                         }
                     elsif talk_to == ravenna.name
-                        select_option("Hi, you said you were sent looking for the sandwich?", ["Yes", "No"], prompt, 2) {|choice| 
+                        select_option(ravenna.introduction, ["Yes", "No"], prompt, 2) {|choice| 
                             if choice == "Yes"
-                                puts "Sorry, but I don't know anything about that maybe go talk to sheriff Berwig"
+                                puts ravenna.response_1
                             else 
-                                puts "Oh ok, never mind then"
+                                puts ravenna.response_2
                             end
                         }
                     elsif talk_to == jabal.name
-                        select_option("What can I help you with?", ["Finding the Holy Sandwich", "Nevermind"], prompt, 2) { |choice|
+                        select_option(jabal.introduction, ["Finding the Holy Sandwich", "Nevermind"], prompt, 2) { |choice|
                             if choice == "Finding the Holy Sandwich"
-                                puts "Ah yes of course, you must make your way over to Saxondale, good luck"
+                                puts jabal.response_1
                             else 
-                                puts "Very well"
+                                puts jabal.response_2
                             end
                         }
                     end
@@ -147,19 +165,19 @@ while main_menu == true
             elsif choice == "Talk to NPCs" and current_location == saxondale.name
                 talk_to_npcs([marita.name, nevan.name], divide) { |talk_to|
                     if talk_to == marita.name
-                        select_option("Well hello, are by chance looking for the 'Holy Sandwich'? ", ["Yes", "No"], prompt, 2) { |choice|
+                        select_option(marita.introduction, ["Yes", "No"], prompt, 2) { |choice|
                             if choice == "Yes"
-                                puts "Go to Nevan he'll have it, just make sure you tell him Marita sent you"
+                                puts marita.response_1
                             else 
-                                puts "Well then, I best be on my way"
+                                puts marita.response_2
                             end
                         }
                     elsif talk_to == nevan.name
-                        select_option("So you say you're looking for the 'Holy Sandwich'?", ["Yes", "No", "Marita sent me"], prompt, 2) { |choice|
+                        select_option(nevan.introduction, ["Yes", "No", "Marita sent me"], prompt, 2) { |choice|
                             if choice == "Yes"
-                                puts "I don't have it go away!"
+                                puts nevan.response_1
                             elsif choice == "No"
-                                puts "Well be gone then"
+                                puts nevan.response_2
                             else 
                                 puts "Ah good, here you go!"
                                 game_loop = false
@@ -195,6 +213,7 @@ while main_menu == true
                             game_menu = false
 
                         else 
+                            game_menu = false
                             game_loop = false
                         end
                     }
