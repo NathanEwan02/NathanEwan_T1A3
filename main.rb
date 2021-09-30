@@ -118,8 +118,12 @@ while main_menu == true
         end
         
         while game_loop == true
-            create_title(fernsworth.name, divide)
 
+            if current_location == fernsworth.name
+                create_title(fernsworth.name, divide)
+            else 
+                create_title(saxondale.name, divide)
+            end
             # location = new Area("tavern", [
             #     new Person("John", {introduction: "Well hello there traveler! May I ask your help?", :yes: "great here is your quest.....", no: "thats a shame, have a good day" }),
             #     new Person("Paul", {introduction: "Well hello there traveler! May I ask your help?", :yes: "great here is your quest.....", no: "thats a shame, have a good day" }),
@@ -136,42 +140,46 @@ while main_menu == true
                 # location.talk_to_npcs
                 talk_to_npcs([berwig.name, ravenna.name, jabal.name], divide) {|talk_to| 
                     if talk_to == berwig.name
-                        select_option(berwig.introduction, ["Yes", "No"], prompt, 2) {|choice| 
-                            if choice == "Yes"
-                                puts berwig.response_1
-                            else 
-                                puts berwig.response_2
-                            end
-                        }
+                        berwig.give_choices("Yes", "No")
+                        # select_option(berwig.introduction, ["Yes", "No"], prompt, 2) {|choice| 
+                        #     if choice == "Yes"
+                        #         puts berwig.response_1
+                        #     else 
+                        #         puts berwig.response_2
+                        #     end
+                        # }
                     elsif talk_to == ravenna.name
-                        select_option(ravenna.introduction, ["Yes", "No"], prompt, 2) {|choice| 
-                            if choice == "Yes"
-                                puts ravenna.response_1
-                            else 
-                                puts ravenna.response_2
-                            end
-                        }
+                        ravenna.give_choices("Yes", "No")
+                        # select_option(ravenna.introduction, ["Yes", "No"], prompt, 2) {|choice| 
+                        #     if choice == "Yes"
+                        #         puts ravenna.response_1
+                        #     else 
+                        #         puts ravenna.response_2
+                        #     end
+                        # }
                     elsif talk_to == jabal.name
-                        select_option(jabal.introduction, ["Finding the Holy Sandwich", "Nevermind"], prompt, 2) { |choice|
-                            if choice == "Finding the Holy Sandwich"
-                                puts jabal.response_1
-                            else 
-                                puts jabal.response_2
-                            end
-                        }
+                        jabal.give_choices("Finding the Holy Sandwich", "Nevermind")
+                        # select_option(jabal.introduction, ["Finding the Holy Sandwich", "Nevermind"], prompt, 2) { |choice|
+                        #     if choice == "Finding the Holy Sandwich"
+                        #         puts jabal.response_1
+                        #     else 
+                        #         puts jabal.response_2
+                        #     end
+                        # }
                     end
                 }
             
             elsif choice == "Talk to NPCs" and current_location == saxondale.name
                 talk_to_npcs([marita.name, nevan.name], divide) { |talk_to|
                     if talk_to == marita.name
-                        select_option(marita.introduction, ["Yes", "No"], prompt, 2) { |choice|
-                            if choice == "Yes"
-                                puts marita.response_1
-                            else 
-                                puts marita.response_2
-                            end
-                        }
+                        marita.give_choices("Yes", "No")
+                        # select_option(marita.introduction, ["Yes", "No"], prompt, 2) { |choice|
+                        #     if choice == "Yes"
+                        #         puts marita.response_1
+                        #     else 
+                        #         puts marita.response_2
+                        #     end
+                        # }
                     elsif talk_to == nevan.name
                         select_option(nevan.introduction, ["Yes", "No", "Marita sent me"], prompt, 2) { |choice|
                             if choice == "Yes"
