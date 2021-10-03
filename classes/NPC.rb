@@ -1,4 +1,11 @@
-require 'tty-prompt'
+begin 
+    require 'tty-prompt'
+rescue LoadError => e 
+    puts "A dependency was unable to load: "
+    puts e.message
+    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
+    exit
+end
 
 class NPC 
     attr_accessor :name, :introduction, :response_1, :response_2
@@ -35,9 +42,4 @@ class NPC
     end
 end 
 
-
-
-
-# me = NPC.new("Nathan", "what do you want", "NO", "OK")
-# me.give_choices("Yes", "No")
 
