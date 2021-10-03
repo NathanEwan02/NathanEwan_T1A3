@@ -19,6 +19,7 @@ end
 
 arg_choice = false
 
+#Establishing command line arguments
 case ARGV[0]
 when '-h' || '--help'
     puts Rainbow("Welcome to the help screen, your options are as follows:").cyan
@@ -242,7 +243,7 @@ while main_menu == true
         end
 
     elsif menu_choice == "Options"
-        puts "Type '--help' to get access to instructions on how to play the game"
+        puts "Type '-h' or '--help' after 'ruby main.rb' to access more information"
     elsif menu_choice == "Exit"
         main_menu = false
     end
