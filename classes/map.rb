@@ -4,7 +4,9 @@ class Map
     
     def initialize(name, npcs)
         @name = name
-        @npc = npcs
+        @npcs = npcs
     end
+
+    
 
 end

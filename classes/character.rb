@@ -8,7 +8,6 @@ class Character
         @name = name
         @race = race
         @char_type = char_type
-        @prompt = TTY::Prompt.new
     end
 
     

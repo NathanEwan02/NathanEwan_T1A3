@@ -7,6 +7,15 @@ rescue LoadError => e
     exit
 end
 
+begin 
+    require 'rainbow'
+rescue LoadError => e 
+    puts "A dependency was unable to load: "
+    puts e.message
+    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
+    exit
+end
+
 class NPC 
     attr_accessor :name, :introduction, :response_1, :response_2
 
@@ -20,11 +29,11 @@ class NPC
     @@prompt = TTY::Prompt.new
 
     def give_choices(player_response1, player_response2)
-        self.class.select_option(@introduction, [player_response1, player_response2], 2) { |choice|
+        self.class.select_option(Rainbow(@introduction).cyan, [player_response1, player_response2], 2) { |choice|
             if choice == player_response1
-                puts @response_1
+                puts Rainbow(@response_1).cyan
             elsif choice == player_response2
-                puts @response_2
+                puts Rainbow(@response_2).cyan
             end
         }
     end
