@@ -1,39 +1,47 @@
-begin
-    require 'tty-prompt' 
-rescue LoadError => e 
-    puts "A dependency was unable to load: "
-    puts e.message
-    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
-    exit
-end
+# adding gems to run
+require 'tty-prompt'
+require 'csv'
+require 'artii'
+require 'rainbow'
 
-begin
-    require 'csv' 
-rescue LoadError => e 
-    puts "A dependency was unable to load: "
-    puts e.message
-    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
-    exit
-end
-
-begin
-    require 'artii' 
-rescue LoadError => e 
-    puts "A dependency was unable to load: "
-    puts e.message
-    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
-    exit
-end
-
+# Adding paths to classes and error handling folders
+require_relative "errors/main_exceptions"
 require_relative "classes/character"
 require_relative "classes/map"
 require_relative "classes/NPC"
 
+#checking for file
+begin
+    CSV.read("player.csv")
+rescue Errno::ENOENT
+    puts "File not found"
+end
+
+arg_choice = false
+
+case ARGV[0]
+when '-h' || '--help'
+    puts Rainbow("Welcome to the help screen, your options are as follows:").cyan
+    puts Rainbow("Type '-n' or '--new' after 'ruby main.rb' to start a new game and skip the main menu").cyan
+    puts Rainbow("Type '-g' or '--guide' after 'ruby main.rb' to access the instructions on how to play").cyan
+when '-n' || '--new'
+    main_menu = true
+    arg_choice = true
+when '-g' || '--guide'
+    puts Rainbow("The Goal of the game is to find the King's 'Holy sandwich', to do this you need to talk to NPC's and listen to their hints").cyan
+    puts Rainbow("You might need to travel to a different location using the game menu, and map menu.").cyan
+    puts Rainbow("Once you have found the sandwich the game will end.").cyan
+else 
+    main_menu = true
+end
+
+# Establishing gems in varibales
 prompt = TTY::Prompt.new
 a = Artii::Base.new
 
 divide = "="*100
 
+#Initialising instances of NPC class
 berwig = NPC.new("Berwig", "Well hello there traveler! Do you need some help finding the 'Holy Sandwich'?", 
     "Alright then, make your way over to Jabal he'll explain the rest", "That's a shame, fair well")
 
@@ -48,6 +56,7 @@ marita = NPC.new("Marita", "Well hello, are by chance looking for the 'Holy Sand
 
 nevan = NPC.new("Nevan", "So you say you're looking for the 'Holy Sandwich'?", "I don't have it go away!", "Well be gone then")
 
+#Initialising instances of Map class
 fernsworth = Map.new("Fernsworth", [berwig, ravenna, jabal])
 saxondale = Map.new("Saxondale", [marita, nevan])
 
@@ -85,20 +94,24 @@ def talk_to_npcs(list_of_people, divide, &block)
     block.call(talk_to)
 end 
 
-puts a.asciify('Holy Sandwich')
-main_menu = true
+#puts a.asciify('Holy Sandwich')
+#main_menu = true
 
 while main_menu == true
+    puts a.asciify('Holy Sandwich')
     create_title("Main Menu", divide)
-
-    choice = prompt.select("What would you like to do?") do |item|
-        item.choice "New Game"
-        item.choice "Options"
-        item.choice "Exit"
+    menu_choice = ''
+    
+    if arg_choice == false
+        menu_choice = prompt.select("What would you like to do?") do |item|
+            item.choice "New Game"
+            item.choice "Options"
+            item.choice "Exit"
+        end
     end
     puts divide
 
-    if choice == "New Game"
+    if menu_choice == "New Game" || arg_choice == true
 
         select_option("Would you like to use an old character?", ["Yes", "No"], prompt, 2) {|choice|
             if choice == "Yes"
@@ -145,10 +158,10 @@ while main_menu == true
 
             if current_location == fernsworth.name
                 create_title(fernsworth.name, divide)
-                puts "You have been tasked by the king to find the Holy Sandwich!"
+                puts Rainbow("You have been tasked by the king to find the Holy Sandwich!").cyan
             else 
                 create_title(saxondale.name, divide)
-                puts "You have been tasked by the king to find the Holy Sandwich!"
+                puts Rainbow("You have been tasked by the king to find the Holy Sandwich!").cyan
             end
         
             choice = prompt.select("Welcome to #{current_location} #{player.name}, what would you like to do?") do |options|
@@ -207,8 +220,15 @@ while main_menu == true
                                 end
                             }
                         elsif choice == "Character Options"
-                            puts ""
-
+                            select_option("Would you like to change your character's name?", ["Yes", "No"], prompt, 2) {|choice|
+                                if choice == "Yes"
+                                    puts "Enter a new name: "
+                                    new_name = gets.chomp.to_s
+                                    player.name = new_name
+                                elsif choice == "No"
+                                    game_menu = false
+                                end
+                            }
                         elsif choice == "Back"
                             game_menu = false
 
@@ -221,9 +241,9 @@ while main_menu == true
             end
         end
 
-    elsif choice == "Options"
-        puts "opt"
-    elsif choice == "Exit"
+    elsif menu_choice == "Options"
+        puts "Type '--help' to get access to instructions on how to play the game"
+    elsif menu_choice == "Exit"
         main_menu = false
     end
     
