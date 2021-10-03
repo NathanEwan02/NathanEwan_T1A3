@@ -1,8 +1,10 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    artii (2.1.2)
     pastel (0.8.0)
       tty-color (~> 0.5)
+    rainbow (3.0.0)
     tty-color (0.6.0)
     tty-cursor (0.7.1)
     tty-prompt (0.23.1)
@@ -19,6 +21,8 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  artii (~> 2.1, >= 2.1.2)
+  rainbow (~> 3.0)
   tty-prompt (~> 0.23.1)
 
 BUNDLED WITH
