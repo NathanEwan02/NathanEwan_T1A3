@@ -1,13 +1,36 @@
-require 'tty-prompt'
-require 'csv'
+begin
+    require 'tty-prompt' 
+rescue LoadError => e 
+    puts "A dependency was unable to load: "
+    puts e.message
+    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
+    exit
+end
 
-require_relative "classes/main_menu"
+begin
+    require 'csv' 
+rescue LoadError => e 
+    puts "A dependency was unable to load: "
+    puts e.message
+    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
+    exit
+end
+
+begin
+    require 'artii' 
+rescue LoadError => e 
+    puts "A dependency was unable to load: "
+    puts e.message
+    puts "Try installing dependencies manually using \"bundle install\" from within the directory"
+    exit
+end
+
 require_relative "classes/character"
-require_relative "classes/game_menu"
 require_relative "classes/map"
 require_relative "classes/NPC"
 
 prompt = TTY::Prompt.new
+a = Artii::Base.new
 
 divide = "="*100
 
@@ -62,6 +85,7 @@ def talk_to_npcs(list_of_people, divide, &block)
     block.call(talk_to)
 end 
 
+puts a.asciify('Holy Sandwich')
 main_menu = true
 
 while main_menu == true
@@ -121,14 +145,11 @@ while main_menu == true
 
             if current_location == fernsworth.name
                 create_title(fernsworth.name, divide)
+                puts "You have been tasked by the king to find the Holy Sandwich!"
             else 
                 create_title(saxondale.name, divide)
+                puts "You have been tasked by the king to find the Holy Sandwich!"
             end
-            # location = new Area("tavern", [
-            #     new Person("John", {introduction: "Well hello there traveler! May I ask your help?", :yes: "great here is your quest.....", no: "thats a shame, have a good day" }),
-            #     new Person("Paul", {introduction: "Well hello there traveler! May I ask your help?", :yes: "great here is your quest.....", no: "thats a shame, have a good day" }),
-            #     new Person("Adam", {introduction: "Well hello there traveler! May I ask your help?", :yes: "great here is your quest.....", no: "thats a shame, have a good day" }),
-            # ])
         
             choice = prompt.select("Welcome to #{current_location} #{player.name}, what would you like to do?") do |options|
                 options.choice "Talk to NPCs"
@@ -137,35 +158,13 @@ while main_menu == true
             puts divide 
 
             if choice == "Talk to NPCs" and current_location == fernsworth.name
-                # location.talk_to_npcs
                 talk_to_npcs([berwig.name, ravenna.name, jabal.name], divide) {|talk_to| 
                     if talk_to == berwig.name
                         berwig.give_choices("Yes", "No")
-                        # select_option(berwig.introduction, ["Yes", "No"], prompt, 2) {|choice| 
-                        #     if choice == "Yes"
-                        #         puts berwig.response_1
-                        #     else 
-                        #         puts berwig.response_2
-                        #     end
-                        # }
                     elsif talk_to == ravenna.name
                         ravenna.give_choices("Yes", "No")
-                        # select_option(ravenna.introduction, ["Yes", "No"], prompt, 2) {|choice| 
-                        #     if choice == "Yes"
-                        #         puts ravenna.response_1
-                        #     else 
-                        #         puts ravenna.response_2
-                        #     end
-                        # }
                     elsif talk_to == jabal.name
                         jabal.give_choices("Finding the Holy Sandwich", "Nevermind")
-                        # select_option(jabal.introduction, ["Finding the Holy Sandwich", "Nevermind"], prompt, 2) { |choice|
-                        #     if choice == "Finding the Holy Sandwich"
-                        #         puts jabal.response_1
-                        #     else 
-                        #         puts jabal.response_2
-                        #     end
-                        # }
                     end
                 }
             
@@ -173,13 +172,6 @@ while main_menu == true
                 talk_to_npcs([marita.name, nevan.name], divide) { |talk_to|
                     if talk_to == marita.name
                         marita.give_choices("Yes", "No")
-                        # select_option(marita.introduction, ["Yes", "No"], prompt, 2) { |choice|
-                        #     if choice == "Yes"
-                        #         puts marita.response_1
-                        #     else 
-                        #         puts marita.response_2
-                        #     end
-                        # }
                     elsif talk_to == nevan.name
                         select_option(nevan.introduction, ["Yes", "No", "Marita sent me"], prompt, 2) { |choice|
                             if choice == "Yes"
@@ -226,8 +218,6 @@ while main_menu == true
                         end
                     }
                 end
-
-                #GameMenu.display_game_menu(player)
             end
         end
 
